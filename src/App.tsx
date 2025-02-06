@@ -3,6 +3,7 @@ import MainLayout from "@/layouts/MainLayout";
 import ListVideos from "@/pages/ListVideos";
 import DetailVideo from "./pages/DetailVideo";
 import SearchPage from "./pages/SearchPage";
+import DetailChanel from "./pages/DetailChanel";
 
 
 const App = () => {
@@ -13,6 +14,8 @@ const App = () => {
             <Route index element={<ListVideos />} />
             <Route path="/watch/:videoId" element={<DetailVideo />} />
             <Route path="/search" element={<SearchPage />} />
+            <Route path="/chanel/:chanelId" element={<DetailChanel />} />
+
           </Route>
         </Routes>
       </BrowserRouter>
