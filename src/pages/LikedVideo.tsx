@@ -112,28 +112,6 @@ const LikedVideo = () => {
     fetchLikedVideos();
   }, []);
 
-  if (loading) {
-    return <div className="flex justify-center items-center h-screen">Loading...</div>;
-  }
-
-  if (!isAuthenticated) {
-    return (
-      <div className="flex flex-col items-center justify-center h-[calc(100vh-56px)]">
-        <h2 className="text-xl mb-4">Đăng nhập để xem video đã thích</h2>
-        <button 
-          onClick={handleGoogleLogin}
-          className="bg-red-600 text-white px-6 py-2 rounded-full hover:bg-red-700 transition-colors"
-        >
-          Đăng nhập bằng Google
-        </button>
-      </div>
-    );
-  }
-
-  if (error) {
-    return <div className="text-red-500 text-center p-4">{error}</div>;
-  }
-
   const formatViews = (viewCount: string) => {
     const count = parseInt(viewCount);
     if (count >= 1000000) {
@@ -144,40 +122,96 @@ const LikedVideo = () => {
     return `${count} lượt xem`;
   };
 
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-[calc(100vh-56px)]">
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-gray-900"></div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[calc(100vh-56px)] bg-gray-50">
+        <div className="bg-white p-8 rounded-lg shadow-sm max-w-md w-full text-center">
+          <h2 className="text-xl font-semibold mb-4">Đăng nhập để xem video đã thích</h2>
+          <p className="text-gray-600 mb-6">Đăng nhập để xem danh sách video bạn đã thích trên YouTube</p>
+          <button 
+            onClick={handleGoogleLogin}
+            className="inline-flex items-center justify-center gap-2 bg-red-600 text-white px-6 py-2.5 rounded-full hover:bg-red-700 transition-colors font-medium"
+          >
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z"/>
+            </svg>
+            Đăng nhập bằng Google
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-[calc(100vh-56px)] bg-gray-50">
+        <div className="bg-white p-6 rounded-lg shadow-sm max-w-md w-full text-center">
+          <div className="text-red-500 mb-2">
+            <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <p className="text-gray-800 font-medium">{error}</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-6">Video đã thích</h1>
+    <div className="max-w-[1280px] mx-auto px-4 py-6">
+      <div className="flex items-center gap-4 mb-6">
+        <div className="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center">
+          <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+          </svg>
+        </div>
+        <div>
+          <h1 className="text-2xl font-bold">Video đã thích</h1>
+          <p className="text-sm text-gray-600">{videos.length} video</p>
+        </div>
+      </div>
+
       {videos.length > 0 ? (
-        <div className="grid grid-cols-1 gap-4">
+        <div className="grid grid-cols-1 gap-3">
           {videos.map((video) => (
             <Link
               to={`/watch/${video.id}`}
               key={video.id}
-              className="flex flex-col md:flex-row gap-4 bg-white rounded-lg overflow-hidden hover:bg-gray-50 transition-colors"
+              className="flex flex-col md:flex-row gap-4 p-2 rounded-xl hover:bg-gray-100 transition-colors"
             >
-              <div className="relative md:w-[360px] aspect-video">
+              <div className="relative md:w-[360px] aspect-video rounded-xl overflow-hidden">
                 <img
                   src={video.snippet.thumbnails.medium.url}
                   alt={video.snippet.title}
                   className="w-full h-full object-cover"
                 />
-                <div className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-20 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                  <svg className="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 24 24">
+                <div className="absolute inset-0 bg-black/0 hover:bg-black/20 flex items-center justify-center opacity-0 hover:opacity-100 transition-all">
+                  <svg className="w-12 h-12 text-white drop-shadow-lg" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M8 5v14l11-7z"/>
                   </svg>
                 </div>
               </div>
-              <div className="flex-1 p-4">
-                <h2 className="font-semibold text-lg mb-2 line-clamp-2 hover:text-blue-600">
+              <div className="flex-1 min-w-0 py-1">
+                <h2 className="text-lg font-medium mb-1 line-clamp-2 text-gray-900 hover:text-blue-600 transition-colors">
                   {video.snippet.title}
                 </h2>
-                <div className="flex items-center text-sm text-gray-600 mb-2">
-                  <span className="hover:text-black">{video.snippet.channelTitle}</span>
-                  <span className="mx-1">•</span>
+                <div className="flex items-center gap-1 text-sm text-gray-600 mb-2">
+                  <span className="font-medium hover:text-gray-900 transition-colors">
+                    {video.snippet.channelTitle}
+                  </span>
+                  <span>•</span>
                   {video.statistics && (
                     <>
                       <span>{formatViews(video.statistics.viewCount)}</span>
-                      <span className="mx-1">•</span>
+                      <span>•</span>
                     </>
                   )}
                   <span>
@@ -195,11 +229,17 @@ const LikedVideo = () => {
           ))}
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center py-12">
-          <p className="text-lg text-gray-600 mb-4">Chưa có video nào trong danh sách yêu thích</p>
+        <div className="flex flex-col items-center justify-center py-16 bg-gray-50 rounded-2xl">
+          <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center mb-4">
+            <svg className="w-12 h-12 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+            </svg>
+          </div>
+          <p className="text-lg font-medium text-gray-900 mb-2">Chưa có video nào trong danh sách yêu thích</p>
+          <p className="text-gray-600 mb-6">Các video bạn thích sẽ xuất hiện tại đây</p>
           <Link 
             to="/"
-            className="bg-red-600 text-white px-6 py-2 rounded-full hover:bg-red-700 transition-colors"
+            className="bg-red-600 text-white px-6 py-2.5 rounded-full hover:bg-red-700 transition-colors font-medium"
           >
             Khám phá video
           </Link>
