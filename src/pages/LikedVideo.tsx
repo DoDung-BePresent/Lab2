@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
+import { formatDistanceToNow } from 'date-fns';
+import { vi } from 'date-fns/locale';
 
 interface Video {
   id: string;
@@ -12,6 +15,11 @@ interface Video {
     };
     channelTitle: string;
     publishedAt: string;
+    description: string;
+  };
+  statistics?: {
+    viewCount: string;
+    likeCount: string;
   };
 }
 
@@ -74,7 +82,7 @@ const LikedVideo = () => {
           `${import.meta.env.VITE_API_URL}/videos`,
           {
             params: {
-              part: 'snippet',
+              part: 'snippet,statistics',
               myRating: 'like',
               maxResults: 50,
             },
@@ -126,44 +134,75 @@ const LikedVideo = () => {
     return <div className="text-red-500 text-center p-4">{error}</div>;
   }
 
+  const formatViews = (viewCount: string) => {
+    const count = parseInt(viewCount);
+    if (count >= 1000000) {
+      return `${(count / 1000000).toFixed(1)}Tr lượt xem`;
+    } else if (count >= 1000) {
+      return `${(count / 1000).toFixed(1)}N lượt xem`;
+    }
+    return `${count} lượt xem`;
+  };
+
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-6">Video đã thích</h1>
       {videos.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-4">
           {videos.map((video) => (
-            <div
+            <Link
+              to={`/watch/${video.id}`}
               key={video.id}
-              className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
+              className="flex flex-col md:flex-row gap-4 bg-white rounded-lg overflow-hidden hover:bg-gray-50 transition-colors"
             >
-              <img
-                src={video.snippet.thumbnails.medium.url}
-                alt={video.snippet.title}
-                className="w-full h-48 object-cover"
-              />
-              <div className="p-4">
-                <h2 className="font-semibold text-lg mb-2 line-clamp-2">
+              <div className="relative md:w-[360px] aspect-video">
+                <img
+                  src={video.snippet.thumbnails.medium.url}
+                  alt={video.snippet.title}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-20 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                  <svg className="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M8 5v14l11-7z"/>
+                  </svg>
+                </div>
+              </div>
+              <div className="flex-1 p-4">
+                <h2 className="font-semibold text-lg mb-2 line-clamp-2 hover:text-blue-600">
                   {video.snippet.title}
                 </h2>
-                <p className="text-gray-600 text-sm">
-                  {video.snippet.channelTitle}
-                </p>
-                <p className="text-gray-500 text-xs mt-1">
-                  {new Date(video.snippet.publishedAt).toLocaleDateString()}
+                <div className="flex items-center text-sm text-gray-600 mb-2">
+                  <span className="hover:text-black">{video.snippet.channelTitle}</span>
+                  <span className="mx-1">•</span>
+                  {video.statistics && (
+                    <>
+                      <span>{formatViews(video.statistics.viewCount)}</span>
+                      <span className="mx-1">•</span>
+                    </>
+                  )}
+                  <span>
+                    {formatDistanceToNow(new Date(video.snippet.publishedAt), {
+                      addSuffix: true,
+                      locale: vi
+                    })}
+                  </span>
+                </div>
+                <p className="text-sm text-gray-600 line-clamp-2">
+                  {video.snippet.description}
                 </p>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center py-12">
           <p className="text-lg text-gray-600 mb-4">Chưa có video nào trong danh sách yêu thích</p>
-          <a 
-            href="/" 
+          <Link 
+            to="/"
             className="bg-red-600 text-white px-6 py-2 rounded-full hover:bg-red-700 transition-colors"
           >
             Khám phá video
-          </a>
+          </Link>
         </div>
       )}
     </div>
