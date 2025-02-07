@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useSearchParams } from "react-router-dom";
 
