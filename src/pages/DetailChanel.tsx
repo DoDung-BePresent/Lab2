@@ -53,7 +53,7 @@ function DetailChanel() {
                 statistics: videoDetailsData.items[index].statistics
             }));
         },
-        staleTime: 30 * 60 * 1000,
+        staleTime: 30 * 60 * 999,
     });
 
     if (isErrorChannel || isErrorVideos) {
