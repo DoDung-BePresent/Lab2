@@ -68,7 +68,6 @@ const ListVideos = () => {
             title={video.snippet.title}
             channelId={video.snippet.channelId}
             id={video.id}
-            avatar={video.avatar}
             channelTitle={video.snippet.channelTitle}
             viewCount={video.statistics.viewCount}
             duration={video.contentDetails.duration}
