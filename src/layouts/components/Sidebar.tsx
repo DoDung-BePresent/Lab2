@@ -63,12 +63,12 @@ const mainNav = {
     },
     {
       title: "Xem sau",
-      url: "#",
+      url: "/watch-later",
       icon: ClockIcon,
     },
     {
       title: "Video đã thích",
-      url: "#",
+      url: "/liked-videos",
       icon: LikeIcon,
     },
   ],
