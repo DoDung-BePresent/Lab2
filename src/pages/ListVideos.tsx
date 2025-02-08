@@ -62,8 +62,8 @@ const ListVideos = () => {
           <VideoItem
             key={video.id}
             thumbnail={
-              video.snippet.thumbnails.maxres?.url ||
-              video.snippet.thumbnails.standard?.url
+              video.snippet.thumbnails?.maxres?.url ||
+              video.snippet.thumbnails?.standard?.url
             }
             title={video.snippet.title}
             channelId={video.snippet.channelId}

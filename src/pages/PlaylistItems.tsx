@@ -1,8 +1,9 @@
 import { EllipsisIcon, SaveIcon, ShareIcon } from "@/components/icon";
 import { useQuery } from "@tanstack/react-query";
-import { Play } from "lucide-react";
+import { LoaderIcon, Play } from "lucide-react";
 import moment from "moment";
-import { useParams } from "react-router-dom";
+import { useEffect } from "react";
+import { Link, useParams } from "react-router-dom";
 import { toast } from "sonner";
 
 const PlaylistItems = () => {
@@ -12,7 +13,7 @@ const PlaylistItems = () => {
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ["playlists"],
+    queryKey: ["playlists", playlistId],
     queryFn: async () => {
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/playlistItems?part=snippet%2CcontentDetails&playlistId=${playlistId}&maxResults=25&key=${import.meta.env.VITE_API_KEY}`,
@@ -23,26 +24,36 @@ const PlaylistItems = () => {
     staleTime: 30 * 60 * 1000,
   });
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   if (isError) {
     toast.error("Đã xảy ra lỗi khi tải danh sách phát!");
   }
 
   if (isLoading) {
-    return <p>Loading</p>;
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <LoaderIcon className="h-10 w-10 animate-spin" />
+      </div>
+    );
   }
+
+  console.log(playlistItems);
   return (
-    <div className="p-6">
-      <div className="flex gap-2">
-        <div className="flex w-96 flex-col gap-2 rounded-2xl bg-gradient-to-b from-slate-100/40 to-slate-100/10 p-6">
+    <div className="lg:p-6">
+      <div className="flex flex-col items-center gap-2 lg:flex-row lg:items-start">
+        <div className="flex w-full flex-col gap-2 rounded-2xl bg-gradient-to-b from-slate-100/40 to-slate-100/10 p-6 lg:w-96">
           <img
             src={
-              playlistItems.items[0].snippet.thumbnails.maxres.url ||
-              playlistItems.items[0].snippet.thumbnails.default.url
+              playlistItems.items[0].snippet.thumbnails?.maxres?.url ||
+              playlistItems.items[0].snippet.thumbnails?.default?.url
             }
             alt=""
-            className="h-48 rounded-md object-cover"
+            className="h-48 rounded-md object-cover sm:h-56"
           />
-          <h1 className="text-3xl font-bold">
+          <h1 className="text-xl font-bold lg:text-3xl">
             {playlistItems.items[0].snippet.title.length > 50
               ? playlistItems.items[0].snippet.title.slice(0, 47) + "..."
               : playlistItems.items[0].snippet.title}
@@ -69,34 +80,38 @@ const PlaylistItems = () => {
         </div>
         <div className="flex-1">
           {playlistItems.items.map((item: any, index: number) => (
-            <div key={item.id} className="flex rounded-md p-2 hover:bg-muted">
-              <span className="my-auto flex h-8 w-8 items-center justify-center">
-                {index + 1}
-              </span>
-              <div className="flex gap-2">
-                <img
-                  src={
-                    item.snippet.thumbnails.maxres.url ||
-                    item.snippet.thumbnails.default.url
-                  }
-                  alt=""
-                  className="h-28 rounded-md object-cover"
-                />
-                <div className="flex-1 space-y-2">
-                  <h1 className="font-medium">{item.snippet.title}</h1>
-                  <div className="text-muted-foreground">
-                    <div className="flex items-center gap-1 text-xs">
-                      <span>{item.snippet.channelTitle}</span>
-                      <span>•</span>
-                      <span>
-                        {moment(item.contentDetails.videoPublishedAt).fromNow()}
-                      </span>
+            <Link key={item.id} to={`/watch/${item.contentDetails.videoId}`}>
+              <div className="flex rounded-md p-2 hover:bg-muted">
+                <span className="my-auto flex h-8 w-8 items-center justify-center">
+                  {index + 1}
+                </span>
+                <div className="flex gap-2">
+                  <img
+                    src={
+                      item.snippet.thumbnails?.maxres?.url ||
+                      item.snippet.thumbnails?.default?.url
+                    }
+                    alt=""
+                    className="h-28 w-52 rounded-md object-cover"
+                  />
+                  <div className="flex-1 space-y-2">
+                    <h1 className="font-medium">{item.snippet.title}</h1>
+                    <div className="text-muted-foreground">
+                      <div className="flex items-center gap-1 text-xs">
+                        <span>{item.snippet.channelTitle}</span>
+                        <span>•</span>
+                        <span>
+                          {moment(
+                            item.contentDetails.videoPublishedAt,
+                          ).fromNow()}
+                        </span>
+                      </div>
                     </div>
                   </div>
+                  <EllipsisIcon className="icon" />
                 </div>
-                <EllipsisIcon className="icon" />
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>

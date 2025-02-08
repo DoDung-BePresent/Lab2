@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { Play } from "lucide-react";
+import { LockIcon, Play } from "lucide-react";
 import { Link } from "react-router-dom";
 import { PlaylistIcon } from "./icon";
 
@@ -10,6 +10,7 @@ interface PlaylistItemProps {
   thumbnails: string;
   videoCount: number;
   className?: string;
+  isPrivate?: boolean;
 }
 
 const PlaylistItem = ({
@@ -19,9 +20,16 @@ const PlaylistItem = ({
   thumbnails,
   videoCount,
   className,
+  isPrivate,
 }: PlaylistItemProps) => {
   return (
-    <Link to={`/playlists/${id}`} className={cn("block", className)}>
+    <Link
+      to={`/playlists/${id}`}
+      onClick={(e) => isPrivate && e.preventDefault()}
+      className={cn("block", className, {
+        "cursor-not-allowed": isPrivate,
+      })}
+    >
       <div className="group relative">
         <div className="rounded-lg bg-background">
           <img
@@ -44,6 +52,12 @@ const PlaylistItem = ({
       </div>
       <div className="mt-3">
         <h3 className="line-clamp-2 font-medium text-white">{title}</h3>
+        {isPrivate && (
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <LockIcon className="h-4 w-4" />
+            <span className="font-medium">Riêng tư</span>
+          </div>
+        )}
         <p className="mt-1 text-sm text-muted-foreground">{channelTitle}</p>
         <p className="text-sm font-medium text-muted-foreground">
           Xem danh sách phát đầy đủ

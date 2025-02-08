@@ -3,8 +3,8 @@ import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { formatSubscribers } from "@/lib/utils";
-import { useState } from "react";
-import { Search } from "lucide-react";
+import { useEffect, useState } from "react";
+import { LoaderIcon, Search } from "lucide-react";
 import { VideoItem } from "@/components/VideoItem";
 import PlaylistItem from "@/components/PlaylistItem";
 
@@ -74,12 +74,20 @@ function DetailChanel() {
     staleTime: 30 * 60 * 1000,
   });
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   if (isErrorChannel || isErrorVideos || isErrorPlaylists) {
     toast.error("Đã xảy ra lỗi khi tải thông tin!");
   }
 
   if (isLoadingChannel || isLoadingVideos || isLoadingPlaylists) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <LoaderIcon className="h-10 w-10 animate-spin" />
+      </div>
+    );
   }
 
   const tabs = [
@@ -110,8 +118,8 @@ function DetailChanel() {
           <Avatar className="h-36 w-36">
             <AvatarImage
               src={
-                channel?.snippet.thumbnails?.high.url ||
-                channel?.snippet.thumbnails?.default.url
+                channel?.snippet.thumbnails?.high?.url ||
+                channel?.snippet.thumbnails?.default?.url
               }
             />
             <AvatarFallback>{channel?.snippet.title.charAt(0)}</AvatarFallback>
