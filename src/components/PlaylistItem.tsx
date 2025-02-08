@@ -21,7 +21,7 @@ const PlaylistItem = ({
   className,
 }: PlaylistItemProps) => {
   return (
-    <Link to={`/playlist/${id}`} className={cn("block", className)}>
+    <Link to={`/playlists/${id}`} className={cn("block", className)}>
       <div className="group relative">
         <div className="rounded-lg bg-background">
           <img
