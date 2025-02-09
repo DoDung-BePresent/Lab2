@@ -31,7 +31,7 @@ const mainNav = {
     },
     {
       title: "Shorts",
-      url: "#",
+      url: "/short",
       icon: ShortVideoIcon,
     },
     {
