@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import style from '../assets/scss/ShortPage.module.scss'; 
 import { PrevIcon } from '../components/icon/PrevIcon';
 import { NextIcon } from '../components/icon/NextIcon';
 import { LikeIcon } from '../components/icon/LikeIcon';
@@ -45,7 +44,7 @@ const getShortVideos = async (channelId: string) => {
   }
 };
 
-const ShortPage: React.FC = () => {
+const ShortPage = () => {
   const [shorts, setShorts] = useState<any[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -73,43 +72,43 @@ const ShortPage: React.FC = () => {
   };
 
   return (
-    <div className={style.shortPageContainer}>
+    <div className="flex flex-col items-center justify-center h-screen bg-[#1a1a1a] text-white relative p-5">
       {shorts.length > 0 && (
-        <div className={style.shortCard}>
+        <div className="relative w-full max-w-md bg-[#2e2e2e] rounded-lg overflow-hidden shadow-lg" style={{ height: '800px' }}>
           <iframe
             src={`https://www.youtube.com/embed/${shorts[currentIndex].id.videoId}`}
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
             title="YouTube video player"
-            className={style.thumbnail}
+            className="w-full h-full border-none"
           ></iframe>
-          <div className={style.infoOverlay}>
-            <h3 className={style.title}>{shorts[currentIndex].snippet.title}</h3>
-            <p className={style.channel}>{shorts[currentIndex].snippet.channelTitle}</p>
+          <div className="absolute bottom-10 left-2.5 right-2.5 z-10 bg-black bg-opacity-60 p-2.5 rounded-md">
+            <h3 className="text-lg font-bold m-0">{shorts[currentIndex].snippet.title}</h3>
+            <p className="text-sm text-gray-400 m-0">{shorts[currentIndex].snippet.channelTitle}</p>
           </div>
         </div>
       )}
-      <div className={style.actionsVertical}>
-        <div className={style.actionButton} style={{display: 'flex', flexDirection: 'column'}}>
+      <div className="absolute right-[430px] top-1/2 transform -translate-y-1/2 flex flex-col gap-4">
+        <div className="flex flex-col items-center justify-center bg-[#444] text-white w-12 h-12 rounded-full cursor-pointer transition-colors duration-300 hover:bg-[#666]">
           <LikeIcon />
-          {shorts.length > 0 && <span>{shorts[currentIndex].statistics.likeCount}</span>}
+          {shorts.length > 0 && <span className="text-xs mt-1">{shorts[currentIndex].statistics.likeCount}</span>}
         </div>
-        <div className={style.actionButton}>
+        <div className="flex flex-col items-center justify-center bg-[#444] text-white w-12 h-12 rounded-full cursor-pointer transition-colors duration-300 hover:bg-[#666]">
           <DislikeIcon />
         </div>
-        <div className={style.actionButton}style={{display: 'flex', flexDirection: 'column'}}>
+        <div className="flex flex-col items-center justify-center bg-[#444] text-white w-12 h-12 rounded-full cursor-pointer transition-colors duration-300 hover:bg-[#666]">
           <CommentIcon />
-          {shorts.length > 0 && <span>{shorts[currentIndex].statistics.commentCount}</span>}
+          {shorts.length > 0 && <span className="text-xs mt-1">{shorts[currentIndex].statistics.commentCount}</span>}
         </div>
-        <div className={style.actionButton}>
+        <div className="flex items-center justify-center bg-[#444] text-white w-12 h-12 rounded-full cursor-pointer transition-colors duration-300 hover:bg-[#666]">
           <ShareShortIcon />
         </div>
       </div>
-      <div className={style.buttonContainer}>
-        <button type="button" className={style.prevButton} onClick={handlePrevVideo} title="Previous Video">
+      <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex flex-col gap-2">
+        <button type="button" className="bg-[#444] text-white w-12 h-12 rounded-full flex items-center justify-center cursor-pointer transition-colors duration-300 hover:bg-[#666]" onClick={handlePrevVideo} title="Previous Video">
           <PrevIcon />
         </button>
-        <button type="button" className={style.nextButton} onClick={handleNextVideo} title="Next Video">
+        <button type="button" className="bg-[#444] text-white w-12 h-12 rounded-full flex items-center justify-center cursor-pointer transition-colors duration-300 hover:bg-[#666]" onClick={handleNextVideo} title="Next Video">
           <NextIcon />
         </button>
       </div>
