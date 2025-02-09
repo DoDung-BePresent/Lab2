@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { PrevIcon } from '../components/icon/PrevIcon';
 import { NextIcon } from '../components/icon/NextIcon';
