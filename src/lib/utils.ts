@@ -24,9 +24,9 @@ export function convertISO8601ToHHMMSS(duration: string) {
 
 export const formatViews = (viewCount: number) => {
   if (viewCount >= 1000000) {
-    return `${(viewCount / 1000000).toFixed(1)}Tr lượt xem`;
+    return `${(viewCount / 1000000).toFixed(1)} Tr lượt xem`;
   } else if (viewCount >= 1000) {
-    return `${(viewCount / 1000).toFixed(1)}N lượt xem`;
+    return `${(viewCount / 1000).toFixed(1)} N lượt xem`;
   }
   return `${viewCount} lượt xem`;
 };
