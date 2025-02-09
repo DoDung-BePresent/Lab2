@@ -1,4 +1,3 @@
-import React from 'react';
 
 export const ShareShortIcon = ({ className }: { className?: string }) => {
   return (
