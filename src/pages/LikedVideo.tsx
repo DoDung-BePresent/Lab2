@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Link } from "react-router-dom";
 import { formatDistanceToNow } from "date-fns";
 import { vi } from "date-fns/locale";
@@ -8,41 +9,7 @@ import { formatViews } from "@/lib/utils";
 
 const LikedVideo = () => {
   const { accessToken, login } = useAuth();
-  //   const fetchLikedVideos = async () => {
-  //     try {
-  //       setLoading(true);
-
-  //       if (!accessToken) {
-  //         setLoading(false);
-  //         return;
-  //       }
-
-  //       const response = await axios.get(
-  //         `${import.meta.env.VITE_API_URL}/videos`,
-  //         {
-  //           params: {
-  //             part: "snippet,statistics",
-  //             myRating: "like",
-  //             maxResults: 50,
-  //           },
-  //           headers: {
-  //             Authorization: `Bearer ${accessToken}`,
-  //           },
-  //         },
-  //       );
-
-  //       if (response.data.items?.length > 0) {
-  //         setVideos(response.data.items);
-  //       }
-  //       setLoading(false);
-  //     } catch (err: any) {
-  //       toast.error(err);
-  //     }
-  //   };
-
-  //   fetchLikedVideos();
-  // }, [accessToken]);
-
+  
   const {
     data: videos,
     isLoading,

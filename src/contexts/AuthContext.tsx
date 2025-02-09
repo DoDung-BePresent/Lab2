@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { getGoogleAuthUrl } from "@/services/auth.service";
 import { createContext, useContext, useState, useEffect } from "react";
 

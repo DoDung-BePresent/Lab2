@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any */
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/contexts/AuthContext";
 import React, { useEffect, useState } from "react";
@@ -42,7 +44,7 @@ const MyChannel: React.FC = () => {
     } catch (error) {
       toast.error("Something went wrong!");
     }
-  }, []);
+  }, [accessToken]);
 
   console.log(channelInfo);
 
