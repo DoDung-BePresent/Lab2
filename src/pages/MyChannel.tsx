@@ -30,9 +30,11 @@ const MyChannel: React.FC = () => {
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [watchLater, setWatchLater] = useState<Video[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [watchedVideos, setWatchedVideos] = useState<Video[]>([]);
+  const [likedVideos, setLikedVideos] = useState<Video[]>([]);
 
-   // Lấy token từ URL hoặc localStorage
-   useEffect(() => {
+  // Lấy token từ URL hoặc localStorage
+  useEffect(() => {
     const params = new URLSearchParams(window.location.hash.substring(1));
     let token = params.get('access_token');
 
@@ -116,6 +118,34 @@ const MyChannel: React.FC = () => {
       const watchLaterData = await watchLaterResponse.json();
       setWatchLater(
         watchLaterData.items.map((item: any) => ({
+          id: item.id,
+          title: item.snippet.title,
+          thumbnail: item.snippet.thumbnails.medium.url,
+        })),
+      );
+
+      // Fetch watched videos 
+      const watchedVideosResponse = await fetch(
+        "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet,contentDetails&playlistId=WATCHED",
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+      const watchedVideosData = await watchedVideosResponse.json();
+      setWatchedVideos(
+        watchedVideosData.items.map((item: any) => ({
+          id: item.id,
+          title: item.snippet.title,
+          thumbnail: item.snippet.thumbnails.medium.url,
+        })),
+      );
+
+      // Fetch liked videos
+      const likedVideosResponse = await fetch(
+        "https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails&myRating=like",
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+      const likedVideosData = await likedVideosResponse.json();
+      setLikedVideos(
+        likedVideosData.items.map((item: any) => ({
           id: item.id,
           title: item.snippet.title,
           thumbnail: item.snippet.thumbnails.medium.url,
@@ -217,6 +247,66 @@ const MyChannel: React.FC = () => {
             ) : (
               <p className="text-gray-400">
                 Không có video trong danh sách xem sau.
+              </p>
+            )}
+          </section>
+
+          {/* Video đã xem */}
+          <section>
+            <h2 className="mb-4 text-xl font-bold">Video đã xem</h2>
+            {watchedVideos.length > 0 ? (
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+                {watchedVideos.map((video) => (
+                  <div
+                    key={video.id}
+                    className="rounded-lg bg-gray-800 shadow-lg"
+                  >
+                    <img
+                      src={video.thumbnail}
+                      alt={video.title}
+                      className="h-40 w-full rounded-t-lg object-cover"
+                    />
+                    <div className="p-4">
+                      <h3 className="line-clamp-2 text-sm font-semibold">
+                        {video.title}
+                      </h3>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-400">
+                Không có video đã xem.
+              </p>
+            )}
+          </section>
+
+          {/* Video đã thích */}
+          <section>
+            <h2 className="mb-4 text-xl font-bold">Video đã thích</h2>
+            {likedVideos.length > 0 ? (
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+                {likedVideos.map((video) => (
+                  <div
+                    key={video.id}
+                    className="rounded-lg bg-gray-800 shadow-lg"
+                  >
+                    <img
+                      src={video.thumbnail}
+                      alt={video.title}
+                      className="h-40 w-full rounded-t-lg object-cover"
+                    />
+                    <div className="p-4">
+                      <h3 className="line-clamp-2 text-sm font-semibold">
+                        {video.title}
+                      </h3>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-400">
+                Không có video đã thích.
               </p>
             )}
           </section>
