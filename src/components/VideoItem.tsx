@@ -32,7 +32,6 @@ export const VideoItem = ({
   channelId
 }: VideoItemProps) => {
 
-  // Fetch avatar từ YouTube API
   const { data: channelData } = useQuery({
     queryKey: ["channel", channelId],
     queryFn: async () => {

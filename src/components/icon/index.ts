@@ -1,3 +1,4 @@
+import { SaveIcon } from "./SaveIcon";
 import { DownloadIcon } from "./DownloadIcon";
 import { EllipsisIcon } from "./EllipsisIcon";
 import { DislikeIcon } from "./DislikeIcon";
@@ -50,4 +51,5 @@ export {
   DislikeIcon,
   EllipsisIcon,
   DownloadIcon,
+  SaveIcon,
 };
