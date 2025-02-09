@@ -22,17 +22,14 @@ export function convertISO8601ToHHMMSS(duration: string) {
   ].join(":");
 }
 
-export function formatViewCount(views: number) {
-  if (views >= 1_000_000) {
-    return (
-      new Intl.NumberFormat("en-US", {
-        notation: "compact",
-        maximumFractionDigits: 1,
-      }).format(views) + " lượt xem"
-    );
+export const formatViews = (viewCount: number) => {
+  if (viewCount >= 1000000) {
+    return `${(viewCount / 1000000).toFixed(1)}Tr lượt xem`;
+  } else if (viewCount >= 1000) {
+    return `${(viewCount / 1000).toFixed(1)}N lượt xem`;
   }
-  return new Intl.NumberFormat("en-US").format(views) + " lượt xem";
-}
+  return `${viewCount} lượt xem`;
+};
 
 export function formatSubscribers(count: number) {
   if (count >= 1e9) {

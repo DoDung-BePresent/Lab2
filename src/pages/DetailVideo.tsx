@@ -9,7 +9,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { VideoItem } from "@/components/VideoItem";
 import { Categories } from "@/layouts/components/Categories";
-import { formatLikes, formatSubscribers, formatViewCount } from "@/lib/utils";
+import { formatLikes, formatSubscribers, formatViews } from "@/lib/utils";
 import { AvatarImage } from "@radix-ui/react-avatar";
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
@@ -105,6 +105,8 @@ const DetailVideo = () => {
     );
   }
 
+  console.log(channel);
+
   return (
     <div className="mx-5 py-5 xl:mx-20">
       <div className="grid gap-5 lg:grid-cols-[1fr_450px]">
@@ -133,9 +135,7 @@ const DetailVideo = () => {
                 <div className="">
                   <h1 className="font-medium">{channel?.snippet?.title}</h1>
                   <p className="text-xs text-muted-foreground">
-                    {video
-                      ? formatSubscribers(channel?.statistics?.subscriberCount)
-                      : ""}
+                    {formatSubscribers(channel?.statistics?.subscriberCount)}
                   </p>
                 </div>
               </div>
@@ -152,9 +152,7 @@ const DetailVideo = () => {
             <div className="rounded-lg bg-white/20 p-3 text-sm">
               <div className="whitespace-pre-wrap font-sans">
                 <div className="flex items-center gap-3 font-medium">
-                  <span>
-                    {formatViewCount(parseInt(video?.statistics?.viewCount))}
-                  </span>
+                  <span>{formatViews(video?.statistics?.viewCount)}</span>
                   <span>{moment(video?.snippet?.publishedAt).fromNow()}</span>
                 </div>
 
