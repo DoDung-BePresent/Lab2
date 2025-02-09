@@ -43,7 +43,7 @@ const mainNav = {
   activity: [
     {
       title: "Kênh của bạn",
-      url: "#",
+      url: "/my-channel",
       icon: MyChannelIcon,
     },
     {
