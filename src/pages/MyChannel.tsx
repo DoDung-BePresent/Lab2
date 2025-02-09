@@ -1,6 +1,7 @@
-
-
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useAuth } from "@/contexts/AuthContext";
 import React, { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 // Interface cho dữ liệu
 interface ChannelInfo {
@@ -25,7 +26,7 @@ interface Video {
 
 // Component chính
 const MyChannel: React.FC = () => {
-  const [accessToken, setAccessToken] = useState<string | null>(null);
+  const { accessToken, login } = useAuth();
   const [channelInfo, setChannelInfo] = useState<ChannelInfo | null>(null);
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [watchLater, setWatchLater] = useState<Video[]>([]);
@@ -33,46 +34,17 @@ const MyChannel: React.FC = () => {
   const [watchedVideos, setWatchedVideos] = useState<Video[]>([]);
   const [likedVideos, setLikedVideos] = useState<Video[]>([]);
 
-  // Lấy token từ URL hoặc localStorage
   useEffect(() => {
-    const params = new URLSearchParams(window.location.hash.substring(1));
-    let token = params.get('access_token');
-
-    if (token) {
-      // Lưu token vào localStorage để sử dụng cho các lần sau
-      localStorage.setItem('access_token', token);
-      // Xóa token khỏi URL để bảo mật
-      window.history.replaceState({}, document.title, window.location.pathname);
-    } else {
-      // Nếu không có token trong URL, kiểm tra trong localStorage
-      token = localStorage.getItem('access_token');
-    }
-
-    if (token) {
-      setAccessToken(token);
-      fetchData(token);
-    } else {
-      setIsLoading(false);  // Không có token, không tải dữ liệu
+    try {
+      if (accessToken) {
+        fetchData(accessToken);
+      }
+    } catch (error) {
+      toast.error("Something went wrong!");
     }
   }, []);
 
-  // Hàm xử lý Google OAuth Login
-  const handleGoogleLogin = () => {
-    const clientId =
-      "356362454055-p7aek6j0lksv1jvsmfj838812ltfa8eu.apps.googleusercontent.com"; // Thay bằng Client ID của bạn
-    const redirectUri = window.location.origin + "/my-channel";
-    const scope = "https://www.googleapis.com/auth/youtube.readonly";
-
-    const authUrl =
-      `https://accounts.google.com/o/oauth2/v2/auth?` +
-      `client_id=${clientId}` +
-      `&redirect_uri=${encodeURIComponent(redirectUri)}` +
-      `&response_type=token` +
-      `&scope=${encodeURIComponent(scope)}` +
-      `&prompt=consent`;
-
-    window.location.href = authUrl;
-  };
+  console.log(channelInfo);
 
   // Hàm fetch dữ liệu từ API
   const fetchData = async (token: string) => {
@@ -124,7 +96,7 @@ const MyChannel: React.FC = () => {
         })),
       );
 
-      // Fetch watched videos 
+      // Fetch watched videos
       const watchedVideosResponse = await fetch(
         "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet,contentDetails&playlistId=WATCHED",
         { headers: { Authorization: `Bearer ${token}` } },
@@ -159,22 +131,21 @@ const MyChannel: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 p-6 text-white">
+    <div className="min-h-screen bg-background p-6 text-white">
       <header className="flex items-center gap-4 p-6">
         {!accessToken ? (
           <button
-            onClick={handleGoogleLogin}
+            onClick={login}
             className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
           >
             Đăng nhập với Google
           </button>
         ) : channelInfo ? (
           <>
-            <img
-              src={channelInfo.avatar}
-              alt="Channel Avatar"
-              className="h-16 w-16 rounded-full object-cover"
-            />
+            <Avatar className="h-20 w-20">
+              <AvatarImage src={channelInfo.avatar} />
+              <AvatarFallback>N</AvatarFallback>
+            </Avatar>
             <div>
               <h1 className="text-2xl font-bold">{channelInfo.title}</h1>
               <p className="text-gray-400">@{channelInfo.customUrl}</p>
@@ -275,9 +246,7 @@ const MyChannel: React.FC = () => {
                 ))}
               </div>
             ) : (
-              <p className="text-gray-400">
-                Không có video đã xem.
-              </p>
+              <p className="text-gray-400">Không có video đã xem.</p>
             )}
           </section>
 
@@ -305,9 +274,7 @@ const MyChannel: React.FC = () => {
                 ))}
               </div>
             ) : (
-              <p className="text-gray-400">
-                Không có video đã thích.
-              </p>
+              <p className="text-gray-400">Không có video đã thích.</p>
             )}
           </section>
         </>
