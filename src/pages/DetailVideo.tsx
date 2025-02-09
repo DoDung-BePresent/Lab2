@@ -12,7 +12,7 @@ import { Categories } from "@/layouts/components/Categories";
 import { formatLikes, formatSubscribers, formatViews } from "@/lib/utils";
 import { AvatarImage } from "@radix-ui/react-avatar";
 import { useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
 import moment from "moment";
@@ -104,9 +104,6 @@ const DetailVideo = () => {
       </div>
     );
   }
-
-  console.log(channel);
-
   return (
     <div className="mx-5 py-5 xl:mx-20">
       <div className="grid gap-5 lg:grid-cols-[1fr_450px]">
@@ -123,22 +120,24 @@ const DetailVideo = () => {
           <div className="my-4 flex flex-col gap-4">
             <h1 className="text-xl font-medium">{video?.snippet.title}</h1>
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Avatar className="h-10 w-10">
-                  <AvatarImage
-                    src={channel?.snippet?.thumbnails?.default?.url}
-                  />
-                  <AvatarFallback>
-                    {channel?.snippet?.title?.charAt(0)}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="">
-                  <h1 className="font-medium">{channel?.snippet?.title}</h1>
-                  <p className="text-xs text-muted-foreground">
-                    {formatSubscribers(channel?.statistics?.subscriberCount)}
-                  </p>
+              <Link to={`/chanel/${channel?.id}`}>
+                <div className="flex items-center gap-3">
+                  <Avatar className="h-10 w-10">
+                    <AvatarImage
+                      src={channel?.snippet?.thumbnails?.default?.url}
+                    />
+                    <AvatarFallback>
+                      {channel?.snippet?.title?.charAt(0)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="">
+                    <h1 className="font-medium">{channel?.snippet?.title}</h1>
+                    <p className="text-xs text-muted-foreground">
+                      {formatSubscribers(channel?.statistics?.subscriberCount)}
+                    </p>
+                  </div>
                 </div>
-              </div>
+              </Link>
               <div className="flex items-center gap-2">
                 <Label
                   icon={<LikeIcon />}
