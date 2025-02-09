@@ -4,21 +4,21 @@ import ListVideos from "@/pages/ListVideos";
 import DetailVideo from "./pages/DetailVideo";
 import SearchPage from "./pages/SearchPage";
 import DetailChanel from "./pages/DetailChanel";
-
+import MyChannel from "./pages/MyChannel";
 
 const App = () => {
   return (
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<MainLayout />}>
-            <Route index element={<ListVideos />} />
-            <Route path="/watch/:videoId" element={<DetailVideo />} />
-            <Route path="/search" element={<SearchPage />} />
-            <Route path="/chanel/:chanelId" element={<DetailChanel />} />
-
-          </Route>
-        </Routes>
-      </BrowserRouter>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<MainLayout />}>
+          <Route index element={<ListVideos />} />
+          <Route path="/watch/:videoId" element={<DetailVideo />} />
+          <Route path="/search" element={<SearchPage />} />
+          <Route path="/chanel/:chanelId" element={<DetailChanel />} />
+          <Route path="/my-channel" element={<MyChannel />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
 };
 
