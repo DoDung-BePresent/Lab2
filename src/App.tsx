@@ -14,7 +14,6 @@ const App = () => {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/auth/callback" element={<Navigate to="/" />} />
           <Route path="/" element={<MainLayout />}>
             <Route index element={<ListVideos />} />
             <Route path="watch/:videoId" element={<DetailVideo />} />
