@@ -28,20 +28,32 @@ export function formatViewCount(views: number) {
       new Intl.NumberFormat("en-US", {
         notation: "compact",
         maximumFractionDigits: 1,
-      }).format(views) + " views"
+      }).format(views) + " lượt xem"
     );
   }
-  return new Intl.NumberFormat("en-US").format(views) + " views";
+  return new Intl.NumberFormat("en-US").format(views) + " lượt xem";
 }
 
 export function formatSubscribers(count: number) {
   if (count >= 1e9) {
-    return (count / 1e9).toFixed(2).replace(/\.?0+$/, "") + " B subscribers";
+    return (count / 1e9).toFixed(2).replace(/\.?0+$/, "") + " B người đăng ký";
   } else if (count >= 1e6) {
-    return (count / 1e6).toFixed(2).replace(/\.?0+$/, "") + " M subscribers";
+    return (count / 1e6).toFixed(2).replace(/\.?0+$/, "") + " Tr người đăng ký";
   } else if (count >= 1e3) {
-    return (count / 1e3).toFixed(2).replace(/\.?0+$/, "") + " K subscribers";
+    return (count / 1e3).toFixed(2).replace(/\.?0+$/, "") + " N người đăng ký";
   } else {
-    return count + " subscribers";
+    return count + " người đăng ký";
+  }
+}
+
+export function formatLikes(count: number) {
+  if (count >= 1e9) {
+    return (count / 1e9).toFixed(2).replace(/\.?0+$/, "") + " B";
+  } else if (count >= 1e6) {
+    return (count / 1e6).toFixed(2).replace(/\.?0+$/, "") + " M";
+  } else if (count >= 1e3) {
+    return (count / 1e3).toFixed(2).replace(/\.?0+$/, "") + " N";
+  } else {
+    return count;
   }
 }

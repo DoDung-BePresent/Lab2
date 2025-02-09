@@ -48,7 +48,7 @@ const mainNav = {
     },
     {
       title: "Danh sách phát",
-      url: "#",
+      url: "/feed/playlists",
       icon: PlaylistIcon,
     },
     {
