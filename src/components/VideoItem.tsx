@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { cn, convertISO8601ToHHMMSS, formatViewCount } from "@/lib/utils";
+import { cn, convertISO8601ToHHMMSS, formatViews } from "@/lib/utils";
 
 interface VideoItemProps {
   id: string;
@@ -92,7 +92,7 @@ export const VideoItem = ({
           <div className="flex items-center gap-1 text-sm text-muted-foreground">
             {viewCount && (
               <div className="flex items-center gap-1">
-                <span>{formatViewCount(viewCount)}</span>
+                <span>{formatViews(viewCount)}</span>
                 <span>•</span>
               </div>
             )}

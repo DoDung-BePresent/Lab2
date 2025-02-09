@@ -1,212 +1,160 @@
-import { useEffect, useState } from 'react';
-import axios from 'axios';
-import { Link } from 'react-router-dom';
-import { formatDistanceToNow } from 'date-fns';
-import { vi } from 'date-fns/locale';
-
-interface Video {
-  id: string;
-  snippet: {
-    title: string;
-    thumbnails: {
-      medium: {
-        url: string;
-      };
-    };
-    channelTitle: string;
-    publishedAt: string;
-    description: string;
-  };
-  statistics?: {
-    viewCount: string;
-    likeCount: string;
-  };
-}
+import { Link } from "react-router-dom";
+import { formatDistanceToNow } from "date-fns";
+import { vi } from "date-fns/locale";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
+import { formatViews } from "@/lib/utils";
 
 const LikedVideo = () => {
-  const [videos, setVideos] = useState<Video[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { accessToken, login } = useAuth();
+  //   const fetchLikedVideos = async () => {
+  //     try {
+  //       setLoading(true);
 
-  const handleGoogleLogin = () => {
-    const clientId = '119593802377-4urliv6puqjse49crlpt72uk08tlu2i5.apps.googleusercontent.com';
-    const redirectUri = window.location.origin + '/liked-videos';
-    const scope = 'https://www.googleapis.com/auth/youtube.readonly';
-    
-    const state = Math.random().toString(36).substring(7);
-    localStorage.setItem('oauth_state', state);
-    
-    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
-      `client_id=${clientId}` +
-      `&redirect_uri=${encodeURIComponent(redirectUri)}` +
-      `&response_type=token` +
-      `&scope=${encodeURIComponent(scope)}` +
-      `&state=${state}` +
-      `&prompt=consent`;
-    
-    window.location.href = authUrl;
-  };
+  //       if (!accessToken) {
+  //         setLoading(false);
+  //         return;
+  //       }
 
-  useEffect(() => {
-    const fetchLikedVideos = async () => {
-      try {
-        const hash = window.location.hash;
-        let accessToken = localStorage.getItem('youtube_access_token');
-        
-        if (hash && hash.includes('access_token')) {
-          const params = new URLSearchParams(hash.substring(1));
-          const newToken = params.get('access_token');
-          const state = params.get('state');
-          
-          if (state !== localStorage.getItem('oauth_state')) {
-            throw new Error('Invalid state parameter');
-          }
-          
-          if (newToken) {
-            accessToken = newToken;
-            localStorage.setItem('youtube_access_token', newToken);
-            localStorage.removeItem('oauth_state');
-            window.location.hash = '';
-            setIsAuthenticated(true);
-          }
-        }
+  //       const response = await axios.get(
+  //         `${import.meta.env.VITE_API_URL}/videos`,
+  //         {
+  //           params: {
+  //             part: "snippet,statistics",
+  //             myRating: "like",
+  //             maxResults: 50,
+  //           },
+  //           headers: {
+  //             Authorization: `Bearer ${accessToken}`,
+  //           },
+  //         },
+  //       );
 
-        if (!accessToken) {
-          setLoading(false);
-          return;
-        }
+  //       if (response.data.items?.length > 0) {
+  //         setVideos(response.data.items);
+  //       }
+  //       setLoading(false);
+  //     } catch (err: any) {
+  //       toast.error(err);
+  //     }
+  //   };
 
-        const response = await axios.get(
-          `${import.meta.env.VITE_API_URL}/videos`,
-          {
-            params: {
-              part: 'snippet,statistics',
-              myRating: 'like',
-              maxResults: 50,
-            },
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-          }
-        );
-        
-        if (response.data.items && response.data.items.length > 0) {
-          setVideos(response.data.items);
-          setIsAuthenticated(true);
-        }
-        setLoading(false);
-      } catch (err) {
-        if (axios.isAxiosError(err) && err.response?.status === 401) {
-          localStorage.removeItem('youtube_access_token');
-          setIsAuthenticated(false);
-          setError('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
-        } else {
-          setError('Không thể tải video đã thích. Vui lòng thử lại sau.');
-        }
-        setLoading(false);
+  //   fetchLikedVideos();
+  // }, [accessToken]);
+
+  const {
+    data: videos,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["likedVideos", accessToken],
+    queryFn: async () => {
+      if (!accessToken) {
+        throw new Error("No access token");
       }
-    };
 
-    fetchLikedVideos();
-  }, []);
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/videos?part=snippet%2Cstatistics&myRating=like&maxResults=50&key=${import.meta.env.VITE_API_KEY}`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      );
 
-  const formatViews = (viewCount: string) => {
-    const count = parseInt(viewCount);
-    if (count >= 1000000) {
-      return `${(count / 1000000).toFixed(1)}Tr lượt xem`;
-    } else if (count >= 1000) {
-      return `${(count / 1000).toFixed(1)}N lượt xem`;
-    }
-    return `${count} lượt xem`;
-  };
+      if (!response.ok) {
+        throw new Error("Failed to fetch playlists");
+      }
 
-  if (loading) {
+      const data = await response.json();
+      return data;
+    },
+    enabled: !!accessToken,
+    staleTime: 30 * 60 * 1000,
+  });
+
+  if (!accessToken) {
     return (
-      <div className="flex justify-center items-center min-h-[calc(100vh-56px)]">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-gray-900"></div>
+      <div className="p-6 text-center">
+        <h1 className="mb-6 text-2xl font-bold text-white">Video đã thích</h1>
+        <button
+          onClick={login}
+          className="rounded-lg bg-red-600 px-4 py-2 text-white hover:bg-red-700"
+        >
+          Đăng nhập với Google
+        </button>
       </div>
     );
   }
 
-  if (!isAuthenticated) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[calc(100vh-56px)] bg-gray-50">
-        <div className="bg-white p-8 rounded-lg shadow-sm max-w-md w-full text-center">
-          <h2 className="text-xl font-semibold mb-4">Đăng nhập để xem video đã thích</h2>
-          <p className="text-gray-600 mb-6">Đăng nhập để xem danh sách video bạn đã thích trên YouTube</p>
-          <button 
-            onClick={handleGoogleLogin}
-            className="inline-flex items-center justify-center gap-2 bg-red-600 text-white px-6 py-2.5 rounded-full hover:bg-red-700 transition-colors font-medium"
-          >
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z"/>
-            </svg>
-            Đăng nhập bằng Google
-          </button>
-        </div>
-      </div>
-    );
+  if (isError) {
+    toast.error("Đã xảy ra lỗi khi tải danh sách video!");
   }
 
-  if (error) {
+  if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[calc(100vh-56px)] bg-gray-50">
-        <div className="bg-white p-6 rounded-lg shadow-sm max-w-md w-full text-center">
-          <div className="text-red-500 mb-2">
-            <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
-          <p className="text-gray-800 font-medium">{error}</p>
-        </div>
+      <div className="flex min-h-[calc(100vh-56px)] items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-t-2 border-gray-900"></div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-[1280px] mx-auto px-4 py-6 bg-[#0f0f0f] min-h-screen">
-      <div className="flex items-center gap-4 mb-6 bg-[#282828] p-4 rounded-xl">
-        <div className="w-12 h-12 bg-gradient-to-br from-red-500 to-red-600 rounded-full flex items-center justify-center">
-          <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+    <div className="mx-auto min-h-screen max-w-[1280px] bg-[#0f0f0f] px-4 py-6">
+      <div className="mb-6 flex items-center gap-4 rounded-xl bg-[#282828] p-4">
+        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-red-500 to-red-600">
+          <svg
+            className="h-6 w-6 text-white"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
           </svg>
         </div>
         <div>
           <h1 className="text-2xl font-bold text-white">Video đã thích</h1>
-          <p className="text-sm text-gray-400">{videos.length} video • Riêng tư</p>
+          <p className="text-sm text-gray-400">
+            {videos?.items.length} video • Riêng tư
+          </p>
         </div>
       </div>
-
-      {videos.length > 0 ? (
+      {videos?.items.length > 0 ? (
         <div className="grid grid-cols-1 gap-3">
-          {videos.map((video) => (
+          {videos?.items.map((video: any) => (
             <Link
               to={`/watch/${video.id}`}
               key={video.id}
-              className="flex flex-col md:flex-row gap-4 p-3 rounded-xl hover:bg-[#282828] transition-all duration-200 bg-[#212121]"
+              className="flex flex-col gap-4 rounded-xl bg-[#212121] p-3 transition-all duration-200 hover:bg-[#282828] md:flex-row"
             >
-              <div className="relative md:w-[360px] aspect-video rounded-xl overflow-hidden group">
+              <div className="group relative aspect-video overflow-hidden rounded-xl md:w-[360px]">
                 <img
-                  src={video.snippet.thumbnails.medium.url}
+                  src={
+                    video.snippet.thumbnails?.maxres?.url ||
+                    video.snippet.thumbnails?.default?.url
+                  }
                   alt={video.snippet.title}
-                  className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-200"
+                  className="h-full w-full transform object-cover transition-transform duration-200 group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200">
-                  <svg className="w-12 h-12 text-white filter drop-shadow-lg transform translate-y-2 group-hover:translate-y-0 transition-transform duration-200" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M8 5v14l11-7z"/>
+                <div className="absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 transition-all duration-200 group-hover:bg-black/20 group-hover:opacity-100">
+                  <svg
+                    className="h-12 w-12 translate-y-2 transform text-white drop-shadow-lg filter transition-transform duration-200 group-hover:translate-y-0"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M8 5v14l11-7z" />
                   </svg>
                 </div>
-                <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/80 text-white text-xs rounded">
+                <div className="absolute bottom-2 right-2 rounded bg-black/80 px-2 py-1 text-xs text-white">
                   3:45
                 </div>
               </div>
-              <div className="flex-1 min-w-0 py-1">
-                <h2 className="text-lg font-medium mb-1 line-clamp-2 text-white hover:text-blue-400 transition-colors">
+              <div className="min-w-0 flex-1 py-1">
+                <h2 className="mb-1 line-clamp-2 text-lg font-medium text-white transition-colors hover:text-blue-400">
                   {video.snippet.title}
                 </h2>
-                <div className="flex flex-wrap items-center gap-x-1 text-sm text-gray-400 mb-2">
-                  <span className="font-medium hover:text-white transition-colors cursor-pointer">
+                <div className="mb-2 flex flex-wrap items-center gap-x-1 text-sm text-gray-400">
+                  <span className="cursor-pointer font-medium transition-colors hover:text-white">
                     {video.snippet.channelTitle}
                   </span>
                   <span>•</span>
@@ -219,11 +167,11 @@ const LikedVideo = () => {
                   <span>
                     {formatDistanceToNow(new Date(video.snippet.publishedAt), {
                       addSuffix: true,
-                      locale: vi
+                      locale: vi,
                     })}
                   </span>
                 </div>
-                <p className="text-sm text-gray-400 line-clamp-2 hover:text-gray-300 transition-colors">
+                <p className="line-clamp-2 text-sm text-gray-400 transition-colors hover:text-gray-300">
                   {video.snippet.description}
                 </p>
               </div>
@@ -231,17 +179,25 @@ const LikedVideo = () => {
           ))}
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center py-16 bg-[#282828] rounded-2xl">
-          <div className="w-24 h-24 bg-[#212121] rounded-full flex items-center justify-center mb-4">
-            <svg className="w-12 h-12 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+        <div className="flex flex-col items-center justify-center rounded-2xl bg-[#282828] py-16">
+          <div className="mb-4 flex h-24 w-24 items-center justify-center rounded-full bg-[#212121]">
+            <svg
+              className="h-12 w-12 text-gray-400"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
             </svg>
           </div>
-          <p className="text-lg font-medium text-white mb-2">Chưa có video nào trong danh sách yêu thích</p>
-          <p className="text-gray-400 mb-6">Các video bạn thích sẽ xuất hiện tại đây</p>
-          <Link 
+          <p className="mb-2 text-lg font-medium text-white">
+            Chưa có video nào trong danh sách yêu thích
+          </p>
+          <p className="mb-6 text-gray-400">
+            Các video bạn thích sẽ xuất hiện tại đây
+          </p>
+          <Link
             to="/"
-            className="bg-gradient-to-r from-red-500 to-red-600 text-white px-6 py-2.5 rounded-full hover:from-red-600 hover:to-red-700 transition-all duration-200 font-medium shadow-md hover:shadow-lg active:scale-95"
+            className="rounded-full bg-gradient-to-r from-red-500 to-red-600 px-6 py-2.5 font-medium text-white shadow-md transition-all duration-200 hover:from-red-600 hover:to-red-700 hover:shadow-lg active:scale-95"
           >
             Khám phá video
           </Link>

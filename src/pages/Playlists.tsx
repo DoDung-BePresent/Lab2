@@ -39,7 +39,6 @@ const Playlists = () => {
     staleTime: 30 * 60 * 1000,
   });
 
-  console.log(playlists);
 
   if (!accessToken) {
     return (
