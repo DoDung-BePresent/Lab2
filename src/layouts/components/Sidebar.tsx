@@ -102,7 +102,7 @@ const mainNav = {
   explore: [
     {
       title: "Thịnh hành",
-      url: "/trending",
+      url: "/feed/trending",
       icon: TrendingIcon,
     },
     {
@@ -172,7 +172,7 @@ export const Sidebar = ({ className }: SidebarProps) => {
           ))}
         </SidebarGroup>
         <SidebarGroup>
-          <h1 className="font-medium mx-2 text-sm mb-2">Khám phá</h1>
+          <h1 className="mx-2 mb-2 text-sm font-medium">Khám phá</h1>
           {mainNav.explore.map((item) => (
             <SidebarItem
               key={item.title}
