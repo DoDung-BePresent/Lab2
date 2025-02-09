@@ -3,6 +3,7 @@ import MainLayout from "@/layouts/MainLayout";
 import ListVideos from "@/pages/ListVideos";
 import DetailVideo from "./pages/DetailVideo";
 import SearchPage from "./pages/SearchPage";
+import LikedVideo from './pages/LikedVideo';
 import DetailChanel from "./pages/DetailChanel";
 import Playlists from "./pages/Playlists";
 import NotFound from "./pages/NotFound";
@@ -21,6 +22,7 @@ const App = () => {
             <Route path="chanel/:chanelId" element={<DetailChanel />} />
             <Route path="feed/playlists" element={<Playlists />} />
             <Route path="playlists/:playlistId" element={<PlaylistItems />} />
+            <Route path="/liked-videos" element={<LikedVideo />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
