@@ -1,9 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useAuth } from "@/contexts/AuthContext";
 import PlaylistItem from "@/components/PlaylistItem";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { LoaderIcon } from "lucide-react";
-import { useEffect } from "react";
 
 const Playlists = () => {
   const { accessToken, login } = useAuth();
@@ -57,10 +57,6 @@ const Playlists = () => {
   if (isError) {
     toast.error("Đã xảy ra lỗi khi tải danh sách phát!");
   }
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
 
   if (isLoading) {
     return (

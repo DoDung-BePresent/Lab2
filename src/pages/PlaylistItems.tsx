@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { EllipsisIcon, SaveIcon, ShareIcon } from "@/components/icon";
 import { useQuery } from "@tanstack/react-query";
 import { LoaderIcon, Play } from "lucide-react";

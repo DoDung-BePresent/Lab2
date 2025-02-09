@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 import { Outlet, useLocation } from "react-router-dom";
 import { useLocalStorage, useMediaQuery } from "usehooks-ts";
 
@@ -22,7 +23,7 @@ const MainLayout = () => {
 
   useEffect(() => {
     isMediumScreen ? setIsOpen(false) : setIsOpen(true);
-  }, [isMediumScreen]);
+  }, [isMediumScreen, setIsOpen]);
 
   return (
     <main className="min-h-screen">
