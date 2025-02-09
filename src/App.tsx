@@ -4,6 +4,7 @@ import ListVideos from "@/pages/ListVideos";
 import DetailVideo from "./pages/DetailVideo";
 import SearchPage from "./pages/SearchPage";
 import DetailChanel from "./pages/DetailChanel";
+import ShortPage from "./pages/ShortPage";
 
 
 const App = () => {
@@ -15,6 +16,7 @@ const App = () => {
             <Route path="/watch/:videoId" element={<DetailVideo />} />
             <Route path="/search" element={<SearchPage />} />
             <Route path="/chanel/:chanelId" element={<DetailChanel />} />
+            <Route path="short" element={<ShortPage />} />
 
           </Route>
         </Routes>
