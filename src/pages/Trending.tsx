@@ -1,7 +1,9 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import axios from "axios";
-import React from "react";
-import "../../../src/index.css";
+import { toast } from "sonner";
+import { LoaderIcon } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { Link } from "react-router-dom";
 
 const SidebarItems = [
   { id: 1, name: "Trending" },
@@ -50,10 +52,14 @@ type VideoType = {
 
 export default function Trending() {
   const [isSelected, setIsSelected] = useState<string>("Trending");
-  const [videos, setVideos] = useState<VideoType[]>([]);
 
-  const fetchVideos = async () => {
-    try {
+  const {
+    data: videos,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["trending", isSelected],
+    queryFn: async () => {
       const searchResponse = await instance.get("search", {
         params: {
           part: "snippet",
@@ -78,7 +84,7 @@ export default function Trending() {
         },
       });
 
-      const videoItems: VideoType[] = videoDetails.data.items.map(
+      return videoDetails.data.items.map(
         (item: {
           snippet: {
             title: string;
@@ -96,24 +102,26 @@ export default function Trending() {
           date: item.snippet.publishedAt,
           description: item.snippet.description,
         }),
-      );
+      ) as VideoType[];
+    },
+    staleTime: 5 * 60 * 1000,
+  });
 
-      setVideos(videoItems);
-    } catch (error) {
-      console.error("Error fetching videos:", error);
-    }
-  };
-
-  useEffect(() => {
-    setVideos([]);
-    fetchVideos();
-  }, [isSelected]);
+  if (isError) {
+    toast.error("Đã xảy ra lỗi khi tải video!");
+  }
 
   return (
     <div className="flex flex-col gap-4 p-8">
       <Header />
       <Sidebar isSelected={isSelected} onIsSelected={setIsSelected} />
-      <VideosList videos={videos} />
+      {isLoading ? (
+        <div className="flex h-screen items-center justify-center">
+          <LoaderIcon className="h-10 w-10 animate-spin" />
+        </div>
+      ) : (
+        <VideosList videos={videos || []} />
+      )}
     </div>
   );
 }
@@ -124,7 +132,7 @@ function Header() {
       <img
         src="https://www.youtube.com/img/trending/avatar/trending_animated.webp"
         alt="logo-trending"
-        className="h-10"
+        className="h-20"
       />
       <h1 className="text-xl font-bold text-white">Trending</h1>
     </div>
@@ -167,10 +175,12 @@ function VideosList({ videos }: { videos: VideoType[] }) {
 
 function Video({ video }: { video: VideoType }) {
   return (
-    <div className="flex gap-4">
-      <Iframe src={`https://www.youtube.com/embed/${video.videoId}`} />
-      <VideoInfo video={video} />
-    </div>
+    <Link to={`/watch/${video.videoId}`}>
+      <div className="flex gap-4">
+        <Iframe src={`https://www.youtube.com/embed/${video.videoId}`} />
+        <VideoInfo video={video} />
+      </div>
+    </Link>
   );
 }
 
