@@ -5,6 +5,7 @@ import DetailVideo from "./pages/DetailVideo";
 import SearchPage from "./pages/SearchPage";
 import LikedVideo from "./pages/LikedVideo";
 import DetailChanel from "./pages/DetailChanel";
+import ShortPage from "./pages/ShortPage";
 import Playlists from "./pages/Playlists";
 import NotFound from "./pages/NotFound";
 import PlaylistItems from "./pages/PlaylistItems";
@@ -21,6 +22,7 @@ const App = () => {
             <Route path="watch/:videoId" element={<DetailVideo />} />
             <Route path="search" element={<SearchPage />} />
             <Route path="chanel/:chanelId" element={<DetailChanel />} />
+            <Route path="short" element={<ShortPage />} />
             <Route path="feed/playlists" element={<Playlists />} />
             <Route path="feed/trending" element={<Trending />} />
             <Route path="playlists/:playlistId" element={<PlaylistItems />} />
