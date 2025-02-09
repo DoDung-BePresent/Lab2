@@ -1,4 +1,3 @@
-import React from 'react';
 
 export const CommentIcon = ({ className }: { className?: string }) => {
   return (

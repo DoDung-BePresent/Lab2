@@ -1,4 +1,3 @@
-import React from 'react';
 
 export const DislikeIcon = ({ className }: { className?: string }) => {
   return (
